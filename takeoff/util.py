@@ -121,12 +121,6 @@ def is_base64(target: Union[str, bytes]) -> bool:
         return False
 
 
-def ensure_base64(s: str) -> str:
-    if not is_base64(s):
-        return b64_encode(s)
-    return s
-
-
 def get_matching_group(find_in: str, pattern: Pattern[str], group: int):
     match = pattern.search(find_in)
 

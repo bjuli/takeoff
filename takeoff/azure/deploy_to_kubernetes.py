@@ -22,7 +22,7 @@ from takeoff.credentials.container_registry import DockerRegistry
 from takeoff.credentials.secret import Secret
 from takeoff.schemas import TAKEOFF_BASE_SCHEMA
 from takeoff.step import Step
-from takeoff.util import b64_encode, ensure_base64, render_string_with_jinja, run_shell_command
+from takeoff.util import b64_encode, render_string_with_jinja, run_shell_command
 
 logger = logging.getLogger(__name__)
 
@@ -187,7 +187,7 @@ class DeployToKubernetes(BaseKubernetes):
         custom_values: Dict[str, str],
     ) -> str:
         """
-        Render the jinja-templated kubernetes configuration adn write it out to a temporary file.
+        Render the jinja-templated kubernetes configuration and write it out to a temporary file.
         Args:
             kubernetes_config_path: The raw, jinja-templated kubernetes configuration path.
             application_name: Current application name
@@ -195,15 +195,15 @@ class DeployToKubernetes(BaseKubernetes):
         Returns:
             The path to the temporary file where the rendered kubernetes configuration is stored.
         """
-        vault_values = {_.jinja_safe_key: ensure_base64(_.val) for _ in secrets}
+        vault_values = {_.jinja_safe_key: _.val for _ in secrets}
 
         context_values = {
             **{
-                _.jinja_safe_key: ensure_base64(_.val)
+                _.jinja_safe_key: _.val
                 for _ in Context().get_or_else(ContextKey.EVENTHUB_PRODUCER_POLICY_SECRETS, {})
             },
             **{
-                _.jinja_safe_key: ensure_base64(_.val)
+                _.jinja_safe_key: _.val
                 for _ in Context().get_or_else(ContextKey.EVENTHUB_CONSUMER_GROUP_SECRETS, {})
             },
         }

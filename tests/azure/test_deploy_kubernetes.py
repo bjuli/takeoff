@@ -86,7 +86,7 @@ kind: Secret
 apiVersion: v1
 type: kubernetes.io/dockerconfigjson
 data:
-  .dockerconfigjson: bm9uYmFzZTY0ZW5jb2RlZHN0cmluZw==
+  .dockerconfigjson: nonbase64encodedstring
 metadata:
   name: registry-auth
   namespace: default"""

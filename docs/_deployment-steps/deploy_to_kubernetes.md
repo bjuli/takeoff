@@ -186,14 +186,23 @@ data:
 The jinja variables `entity1_connection_string` and `entity2_connection_string` are named by your `eventhub_entity_naming` in `create_producer_policies`, posfixed with `connection_string`.
 
 ## Base64 encoding of secrets
-Kubernetes requires the values of secrets to be base64 encoded. Takeoff enables this, and by default takes the following approach:
-- Any values that are inserted into your Kubernetes template that originate from the *Keyvault* are assumed to be confidential. As such, Takeoff will ensure that these values
-are base64 encoded, as they should only be used in Kubernetes secrets.
-- Any values that are inserted into your Kubernetes template via the *custom values* support (i.e. that are supplied in Takeoff's deployment.yml) are assumed to __not__ be confidential. These
-values will therefore be inserted into the template in plain text.
+Kubernetes requires the values of secrets to be base64 encoded. Values that are inserted 
+into your Kubernetes template that originate from the *Keyvault* or via the *custom values* support (i.e. that are 
+supplied in Takeoff's deployment.yml) be inserted into the template in plain text. The user should be responsible for the base64 encoding:
+- Provide or store secret base64 encoded
+- In `my_kubernetes_config.yml.j2` use `stringData` parameter. Kubernetes then automatically base64 encodes the secret.
+  Example:
+  ```yaml
+  apiVersion: v1
+  kind: Secret
+  metadata:
+    name: armada-connections
+  data:
+    provided-base64-secret: {{ provided_base64_secret }}
+  stringData:
+    provided-nonbase64-secret: {{ provided_nonbase64_secret }}
+  ```
 
-We believe these two assumptions are reasonable, and recommend you do not deviate from this. If, for some reason, you want/need to deviate from this, you can by using the following two filters in your Jinja template:
+If, for some reason, you want/need to deviate from this, you can by using the following two filters in your Jinja template:
 - `b64_encode`: apply base64 encoding. Example usage: `{{ non_encoded_value |  b64_encode }}`
 - `b64_decode`: apply base64 decoding. Example usage: `{{ encoded_value |  b64_decode }}`
-
-TL;DR: secrets are base64 encoded by default, custom_values are not. You can deviate from this using the jinja2 filters if you like.
